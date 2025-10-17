@@ -36,96 +36,101 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading = fals
   };
 
   return (
-    <div className='w-full max-w-md mx-auto'>
-      <div className='bg-gray-900/80 backdrop-blur-sm rounded-lg shadow-lg p-8'>
-        <Form.Root onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          {/* Título */}
-          <div className='text-center mb-8'>
-            <h1 className='text-2xl font-semibold text-white mb-2'>Bem-vindo de volta!</h1>
-            <p className='text-gray-400'>Faça login para acessar sua conta</p>
-          </div>
-
+    <div className='flex items-center justify-center min-h-screen'>
+      <div
+        className='bg-[var(--color-mauve-dark-700)] rounded-lg p-6'
+        style={{ width: '412px', height: '242px' }}
+      >
+        <Form.Root
+          onSubmit={handleSubmit(onSubmit)}
+          className='h-full flex flex-col justify-between'
+        >
           {/* Erro geral */}
           {error && (
-            <div className='bg-red-500/10 border border-red-500/20 rounded-lg p-3'>
-              <p className='text-red-400 text-sm'>{error}</p>
+            <div className='bg-red-500/10 border border-red-500/20 rounded-lg p-2 mb-2'>
+              <p className='text-red-400 text-xs'>{error}</p>
             </div>
           )}
 
           {/* Campo Nome/E-mail */}
-          <Form.Field name='email' className='space-y-2'>
-            <Label.Root className='text-sm font-medium text-gray-300'>Nome/E-mail</Label.Root>
+          <Form.Field name='email' className='mb-3'>
+            <Label.Root className='text-xs font-medium text-[var(--color-mauve-dark-300)] mb-1 block'>
+              Nome/E-mail
+            </Label.Root>
             <Form.Control asChild>
               <input
                 {...register('email')}
                 type='email'
                 placeholder='Digite seu nome/E-mail'
-                className='w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all'
+                className='w-full px-3 py-2 bg-transparent border border-[var(--color-mauve-dark-950)] rounded text-[var(--color-mauve-dark-extra-3)] focus:outline-none focus:border-[var(--color-purple-950)] transition-all text-sm'
               />
             </Form.Control>
             {errors.email && (
-              <Form.Message className='text-red-400 text-sm'>{errors.email.message}</Form.Message>
+              <Form.Message className='text-red-400 text-xs mt-1'>
+                {errors.email.message}
+              </Form.Message>
             )}
           </Form.Field>
 
           {/* Campo Senha */}
-          <Form.Field name='password' className='space-y-2'>
-            <Label.Root className='text-sm font-medium text-gray-300'>Senha</Label.Root>
+          <Form.Field name='password' className='mb-3'>
+            <Label.Root className='text-xs font-medium text-[var(--color-mauve-dark-300)] mb-1 block'>
+              Senha
+            </Label.Root>
             <div className='relative'>
               <Form.Control asChild>
                 <input
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   placeholder='Digite sua senha'
-                  className='w-full px-4 py-3 pr-12 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all'
+                  className='w-full px-3 py-2 pr-10 bg-transparent border border-[var(--color-mauve-dark-950)] rounded text-[var(--color-mauve-dark-extra-3)] placeholder-[var(--color-mauve-dark-extra-3)]/60 focus:outline-none focus:border-[var(--color-purple-950)] transition-all text-sm'
                 />
               </Form.Control>
               <button
                 type='button'
                 onClick={togglePasswordVisibility}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors'
+                className='absolute right-2 top-1/2 transform -translate-y-1/2 text-[var(--color-mauve-dark-extra-3)]/60 hover:text-[var(--color-mauve-dark-extra-3)] transition-colors'
               >
                 {showPassword ? (
-                  <EyeNoneIcon className='w-5 h-5' />
+                  <EyeNoneIcon className='w-4 h-4' />
                 ) : (
-                  <EyeOpenIcon className='w-5 h-5' />
+                  <EyeOpenIcon className='w-4 h-4' />
                 )}
               </button>
             </div>
             {errors.password && (
-              <Form.Message className='text-red-400 text-sm'>
+              <Form.Message className='text-red-400 text-xs mt-1'>
                 {errors.password.message}
               </Form.Message>
             )}
           </Form.Field>
 
-          {/* Link Esqueci minha senha */}
-          <div className='text-right'>
+          {/* Link Esqueci minha senha e Botão Entrar */}
+          <div className='flex justify-between items-center'>
             <button
               type='button'
-              className='text-violet-400 hover:underline text-sm transition-all'
+              className='text-[var(--color-purple-950)] underline text-xs transition-all'
             >
               Esqueci minha senha
             </button>
-          </div>
 
-          {/* Botão Entrar */}
-          <Form.Submit asChild>
-            <button
-              type='submit'
-              disabled={isLoading}
-              className='w-full py-3 px-4 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 disabled:from-violet-600/50 disabled:to-violet-700/50 text-white font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900'
-            >
-              {isLoading ? (
-                <div className='flex items-center justify-center gap-2'>
-                  <div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />
-                  Entrando...
-                </div>
-              ) : (
-                'Entrar'
-              )}
-            </button>
-          </Form.Submit>
+            <Form.Submit asChild>
+              <button
+                type='submit'
+                disabled={isLoading}
+                className='py-2 px-6 bg-[var(--color-purple-950)] hover:bg-[var(--color-purple-950)]/80 disabled:bg-[var(--color-purple-950)]/50 text-white font-medium rounded transition-all duration-200 focus:outline-none text-sm'
+              >
+                {isLoading ? (
+                  <div className='flex items-center justify-center gap-2'>
+                    <div className='w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin' />
+                    Entrando...
+                  </div>
+                ) : (
+                  'Entrar'
+                )}
+              </button>
+            </Form.Submit>
+          </div>
         </Form.Root>
       </div>
     </div>
