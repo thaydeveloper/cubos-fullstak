@@ -1,31 +1,21 @@
-import { useState } from 'react';
-import { Header } from './components/layout';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Login } from './pages';
+import { MainLayout } from './components/layout';
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    console.log('Theme toggled:', !isDarkMode ? 'Dark' : 'Light');
-  };
-
-  const handleLogout = () => {
-    console.log('Logout clicked');
-    alert('Logout realizado!');
-  };
-
   return (
-    <div className='min-h-screen bg-background text-foreground'>
-      {/* Header */}
-      <Header 
-        isDarkMode={isDarkMode}
-        onThemeToggle={handleThemeToggle}
-        onLogout={handleLogout}
-      />
+    <Router>
+      <Routes>
+        {/* Todas as rotas usam o layout principal (Header) */}
+        <Route path='/' element={<MainLayout />}>
+          <Route path='login' element={<Login />} />
+          <Route index element={<Navigate to='/login' replace />} />
+        </Route>
 
-      {/* Main Content */}
-      <main className='container mx-auto px-4 py-8'>{/* Welcome Section */}</main>
-    </div>
+        {/* Redirect para login por padrão */}
+        <Route path='*' element={<Navigate to='/login' replace />} />
+      </Routes>
+    </Router>
   );
 }
 

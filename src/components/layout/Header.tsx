@@ -12,7 +12,10 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLogout }) => {
   return (
     <Tooltip.Provider>
-      <header className='w-full border-b bg-[var(--color-mauve-dark-200)]/[0.9] border-[var(--color-mauve-alpha-16)]'>
+      <header
+        className='fixed top-0 left-0 w-full border-b-[1px] border-[var(--color-mauve-alpha-16)]  z-50'
+        style={{ backgroundColor: 'rgba(18, 17, 19, 0.9)' }}
+      >
         <div className='w-full px-4 md:px-6 lg:px-8'>
           <div className='flex items-center justify-between h-14 md:h-16'>
             {/* Logo */}
