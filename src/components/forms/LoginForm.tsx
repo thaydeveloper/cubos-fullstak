@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +23,7 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading = false, error }) => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -33,6 +35,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading = fals
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleNavigateToRegister = () => {
+    navigate('/register');
   };
 
   return (
@@ -114,22 +120,32 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading = fals
               Esqueci minha senha
             </button>
 
-            <Form.Submit asChild>
+            <div className='flex gap-2'>
               <button
-                type='submit'
-                disabled={isLoading}
-                className='py-2 px-6 bg-[var(--color-purple-950)] hover:bg-[var(--color-purple-950)]/80 disabled:bg-[var(--color-purple-950)]/50 text-white font-medium rounded transition-all duration-200 focus:outline-none text-sm'
+                type='button'
+                onClick={handleNavigateToRegister}
+                className='py-2 px-6 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded transition-all duration-200 focus:outline-none text-sm'
               >
-                {isLoading ? (
-                  <div className='flex items-center justify-center gap-2'>
-                    <div className='w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin' />
-                    Entrando...
-                  </div>
-                ) : (
-                  'Entrar'
-                )}
+                Registrar
               </button>
-            </Form.Submit>
+
+              <Form.Submit asChild>
+                <button
+                  type='submit'
+                  disabled={isLoading}
+                  className='py-2 px-6 bg-[var(--color-purple-950)] hover:bg-[var(--color-purple-950)]/80 disabled:bg-[var(--color-purple-950)]/50 text-white font-medium rounded transition-all duration-200 focus:outline-none text-sm'
+                >
+                  {isLoading ? (
+                    <div className='flex items-center justify-center gap-2'>
+                      <div className='w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin' />
+                      Entrando...
+                    </div>
+                  ) : (
+                    'Entrar'
+                  )}
+                </button>
+              </Form.Submit>
+            </div>
           </div>
         </Form.Root>
       </div>
