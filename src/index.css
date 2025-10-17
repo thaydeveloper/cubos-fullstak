@@ -3,8 +3,105 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Purple Dark Palette  */
+  --color-purple-50: #D19DFF;
+  --color-purple-100: #3D224E;
+  --color-purple-200: #C794F9;
+  --color-purple-300: #00041B;
+  --color-purple-400: #18111B;
+  --color-purple-500: #1E1523;
+  --color-purple-600: #48295C;
+  --color-purple-700: #54346B;
+  --color-purple-800: #664282;
+  --color-purple-900: #8457AA;
+  --color-purple-950: #8E4EC6;
+  --color-purple-accent: #9A5CD0;
+
+  /* Cores adicionais da paleta */
+  --color-purple-extra-1: #B412F9;
+  --color-purple-extra-2: #B661FF;
+  --color-purple-extra-3: #5744F7;
+  --color-purple-extra-4: #BB53FD;
+  --color-purple-extra-5: #BC6FFF;
+  --color-purple-extra-6: #BE5CFD;
+  --color-purple-extra-7: #C150FF;
+  --color-purple-extra-8: #C16DFD;
+  --color-purple-extra-9: #C378FD;
+  --color-purple-extra-10: #C47EFF;
+  --color-purple-light: #ECD9FA;
+  --color-purple-lightest: #F1DDFF;
+
+  /* Mauve Dark Palette  */
+  --color-mauve-dark-50: #A09EA7;
+  --color-mauve-dark-100: #85B2BC;
+  --color-mauve-dark-200: #121113;
+  --color-mauve-dark-300: #EEEFF0;
+  --color-mauve-dark-400: #000000;
+  --color-mauve-dark-500: #004418;
+  --color-mauve-dark-600: #1A191B;
+  --color-mauve-dark-700: #232225;
+  --color-mauve-dark-800: #2B292D;
+  --color-mauve-dark-900: #323035;
+  --color-mauve-dark-950: #3C393F;
+
+  /* Mauve Dark adicionas */
+  --color-mauve-dark-extra-1: #49474E;
+  --color-mauve-dark-extra-2: #625F69;
+  --color-mauve-dark-extra-3: #6F6D78;
+  --color-mauve-dark-extra-4: #7C7A85;
+  --color-mauve-dark-extra-5: #EAE6FD;
+  --color-mauve-dark-extra-6: #EBEAF8;
+  --color-mauve-dark-extra-7: #ECE9FD;
+  --color-mauve-dark-extra-8: #EEE5F8;
+  --color-mauve-dark-extra-9: #EEE7FF;
+  --color-mauve-dark-extra-10: #EEE9FF;
+  --color-mauve-dark-extra-11: #FFF6FF;
+  --color-mauve-dark-extra-12: #F1E6FD;
+  --color-mauve-dark-extra-13: #F5F1FF;
+  --color-mauve-dark-extra-14: #F5F4F6;
+  --color-mauve-dark-extra-15: #FDF6FF;
+
+  /* Mauve */
+  --color-mauve-1: #000418;
+  --color-mauve-2: #211F26;
+  --color-mauve-3: #FDFCFD;
+  --color-mauve-4: #020008;
+  --color-mauve-5: #040011;
+  --color-mauve-6: #050019;
+  --color-mauve-7: #05001D;
+  --color-mauve-8: #080031;
+  --color-mauve-9: #100033;
+  --color-mauve-10: #140035;
+  --color-mauve-11: #1C2024;
+
+
+  /* Mauve Alpha Colors */
+  --color-mauve-alpha-1: #200036;
+  --color-mauve-alpha-2: #200038;
+  --color-mauve-alpha-3: #2B0055;
+  --color-mauve-alpha-4: #300040;
+  --color-mauve-alpha-5: #550055;
+  --color-mauve-alpha-6: #65636D;
+  --color-mauve-alpha-7: #84828E;
+  --color-mauve-alpha-8: #8E8C99;
+  --color-mauve-alpha-9: #BCBAC7;
+  --color-mauve-alpha-10: #D0CDD7;
+  --color-mauve-alpha-11: #DBD8E0;
+  --color-mauve-alpha-12: #E3DFE6;
+  --color-mauve-alpha-13: #EAE7EC;
+  --color-mauve-alpha-14: #F2EFF3;
+  --color-mauve-alpha-15: #FAF9FB;
+
+}
+
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   body {
+    @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
