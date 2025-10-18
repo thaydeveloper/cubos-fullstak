@@ -1,7 +1,8 @@
 import React from 'react';
 import * as Switch from '@radix-ui/react-switch';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { SunIcon, MoonIcon } from '@radix-ui/react-icons';
+import MoonIconSvg from '../../assets/icons/Moon.svg';
+import SunIconSvg from '../../assets/icons/tema-claro.svg';
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -13,8 +14,11 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLog
   return (
     <Tooltip.Provider>
       <header
-        className='fixed top-0 left-0 w-full border-b-[1px] border-[var(--color-mauve-alpha-16)]  z-50'
-        style={{ backgroundColor: 'rgba(18, 17, 19, 0.95)' }}
+        className='fixed top-0 left-0 w-full border-b-[1px] z-50 transition-colors duration-300'
+        style={{
+          backgroundColor: isDarkMode ? 'rgba(18, 17, 19, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          borderColor: isDarkMode ? 'var(--color-mauve-alpha-16)' : 'var(--color-mauve-alpha-12)',
+        }}
       >
         <div className='w-full px-4 md:px-6 lg:px-8'>
           <div className='flex items-center justify-between h-14 md:h-16'>
@@ -24,17 +28,22 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLog
               <img
                 src='/src/assets/icons/Title-header.svg'
                 alt='CUBOS Movies'
-                className='hidden md:block h-9'
+                className='hidden md:block h-9 transition-all duration-300'
+                style={{
+                  filter: isDarkMode ? 'none' : 'invert(1) brightness(0)',
+                }}
               />
               {/* Mobile Logo */}
               <img
                 src='/src/assets/icons/Title-header-mobile.svg'
                 alt='CUBOS Movies'
-                className='block md:hidden h-9'
+                className='block md:hidden h-9 transition-all duration-300'
+                style={{
+                  filter: isDarkMode ? 'none' : 'invert(1) brightness(0)',
+                }}
               />
             </div>
 
-            {/* Right Side - Theme Toggle + Logout */}
             <div className='flex items-center gap-2 md:gap-4'>
               {/* Theme Toggle */}
               <Tooltip.Root>
@@ -49,9 +58,9 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLog
                     <Switch.Thumb className='block w-4 h-4 md:w-5 md:h-5 bg-white rounded-full transition-transform duration-200 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[20px] md:data-[state=checked]:translate-x-[22px] shadow-sm'>
                       <div className='w-full h-full flex items-center justify-center'>
                         {isDarkMode ? (
-                          <MoonIcon className='w-2.5 h-2.5 md:w-3 md:h-3 text-purple-600' />
+                          <img src={MoonIconSvg} alt='Moon' className='w-3 h-3 md:w-3.5 md:h-3.5' />
                         ) : (
-                          <SunIcon className='w-2.5 h-2.5 md:w-3 md:h-3 text-mauve-alpha-7' />
+                          <img src={SunIconSvg} alt='Sun' className='w-3 h-3 md:w-3.5 md:h-3.5' />
                         )}
                       </div>
                     </Switch.Thumb>
@@ -60,11 +69,23 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLog
 
                 <Tooltip.Portal>
                   <Tooltip.Content
-                    className='px-3 py-2 rounded-md text-sm shadow-lg bg-mauve-dark-900 text-[var(--color-mauve-alpha-16)]'
+                    className='px-3 py-2 rounded-md text-sm shadow-lg transition-colors duration-300'
+                    style={{
+                      backgroundColor: isDarkMode
+                        ? 'var(--color-mauve-dark-900)'
+                        : 'var(--color-mauve-dark-700)',
+                      color: '#FFFFFF',
+                    }}
                     sideOffset={5}
                   >
                     {isDarkMode ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
-                    <Tooltip.Arrow className='fill-mauve-dark-900' />
+                    <Tooltip.Arrow
+                      style={{
+                        fill: isDarkMode
+                          ? 'var(--color-mauve-dark-900)'
+                          : 'var(--color-mauve-dark-700)',
+                      }}
+                    />
                   </Tooltip.Content>
                 </Tooltip.Portal>
               </Tooltip.Root>

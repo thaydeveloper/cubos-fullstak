@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
       },
       colors: {
         purple: {
@@ -36,9 +36,8 @@ export default {
             10: 'var(--color-purple-extra-10)',
           },
         },
-        // Mauve Palette (Cores Antigas + Novas)
+
         mauve: {
-          // Cores antigas (50-950)
           50: 'var(--color-mauve-50)',
           100: 'var(--color-mauve-100)',
           200: 'var(--color-mauve-200)',
@@ -50,7 +49,7 @@ export default {
           800: 'var(--color-mauve-800)',
           900: 'var(--color-mauve-900)',
           950: 'var(--color-mauve-950)',
-          // Cores extras antigas
+
           'extra-1': 'var(--color-mauve-extra-1)',
           'extra-2': 'var(--color-mauve-extra-2)',
           'extra-3': 'var(--color-mauve-extra-3)',
@@ -66,7 +65,7 @@ export default {
           'extra-13': 'var(--color-mauve-extra-13)',
           'extra-14': 'var(--color-mauve-extra-14)',
           'extra-15': 'var(--color-mauve-extra-15)',
-          // Novas cores (1-11)
+
           1: 'var(--color-mauve-1)',
           2: 'var(--color-mauve-2)',
           3: 'var(--color-mauve-3)',
@@ -79,7 +78,7 @@ export default {
           10: 'var(--color-mauve-10)',
           11: 'var(--color-mauve-11)',
         },
-        // Mauve Alpha Palette
+
         'mauve-alpha': {
           1: 'var(--color-mauve-alpha-1)',
           2: 'var(--color-mauve-alpha-2)',
@@ -97,39 +96,31 @@ export default {
           14: 'var(--color-mauve-alpha-14)',
           15: 'var(--color-mauve-alpha-15)',
         },
-        background: 'var(--color-background)',
-        foreground: 'var(--color-foreground)',
+
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
         card: {
-          DEFAULT: 'var(--color-card)',
-          foreground: 'var(--color-card-foreground)',
-        },
-        popover: {
-          DEFAULT: 'var(--color-popover)',
-          foreground: 'var(--color-popover-foreground)',
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
         },
         primary: {
-          DEFAULT: 'var(--color-primary)',
-          foreground: 'var(--color-primary-foreground)',
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
         },
         secondary: {
-          DEFAULT: 'var(--color-secondary)',
-          foreground: 'var(--color-secondary-foreground)',
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
         },
         muted: {
-          DEFAULT: 'var(--color-muted)',
-          foreground: 'var(--color-muted-foreground)',
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
         },
         accent: {
-          DEFAULT: 'var(--color-accent)',
-          foreground: 'var(--color-accent-foreground)',
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
         },
-        destructive: {
-          DEFAULT: 'var(--color-destructive)',
-          foreground: 'var(--color-destructive-foreground)',
-        },
-        border: 'var(--color-border)',
-        input: 'var(--color-input)',
-        ring: 'var(--color-ring)',
+        border: 'var(--border)',
+        input: 'var(--input)',
       },
     },
   },

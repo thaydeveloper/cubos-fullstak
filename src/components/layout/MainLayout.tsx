@@ -1,19 +1,22 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useThemeStore } from '../../store';
 
 export const MainLayout = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
-
   const { logout } = useAuthStore();
+  const { isDarkMode, toggleTheme } = useThemeStore();
 
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    console.log('Theme toggled:', !isDarkMode ? 'Dark' : 'Light');
-  };
+  // Aplica o tema ao montar o componente
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   const handleLogout = () => {
     logout();
@@ -21,9 +24,9 @@ export const MainLayout = () => {
   };
 
   return (
-    <div className='min-h-screen bg-background text-foreground'>
-      {/* Header - só mostra logout se não for página de login */}
-      <Header isDarkMode={isDarkMode} onThemeToggle={handleThemeToggle} onLogout={handleLogout} />
+    <div className='min-h-screen bg-background text-foreground transition-colors duration-300'>
+      {/* Header */}
+      <Header isDarkMode={isDarkMode} onThemeToggle={toggleTheme} onLogout={handleLogout} />
 
       {/* Main Content */}
       <main className='flex-1 pt-14 md:pt-16 pb-14 md:pb-16'>
