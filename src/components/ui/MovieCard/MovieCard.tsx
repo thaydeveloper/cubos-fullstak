@@ -2,29 +2,7 @@ import React from 'react';
 import { cn } from '../../../utils/cn';
 import { PercentageCircle } from '../PercentageCircle';
 import type { MovieCardProps } from './MovieCard.types';
-
-// Mapa de gêneros do TMDB
-const GENRE_MAP: Record<number, string> = {
-  28: 'Ação',
-  12: 'Aventura',
-  16: 'Animação',
-  35: 'Comédia',
-  80: 'Crime',
-  99: 'Documentário',
-  18: 'Drama',
-  10751: 'Família',
-  14: 'Fantasia',
-  36: 'História',
-  27: 'Terror',
-  10402: 'Música',
-  9648: 'Mistério',
-  10749: 'Romance',
-  878: 'Ficção Científica',
-  10770: 'Cinema TV',
-  53: 'Thriller',
-  10752: 'Guerra',
-  37: 'Faroeste',
-};
+import { GENRE_MAP } from '../../../constants';
 
 export const MovieCard: React.FC<MovieCardProps> = ({
   title,
@@ -88,10 +66,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
 
         {/* Círculo de porcentagem - só aparece no hover */}
         <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-100 z-20'>
-          <div
-            className='rounded-full p-2'
-            /*  */
-          >
+          <div className='rounded-full p-2'>
             <PercentageCircle percentage={percentage} size='medium' />
           </div>
         </div>

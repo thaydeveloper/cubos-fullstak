@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { FilterModal } from '../components/ui/FilterModal';
+import type { MovieFilters } from '../components/ui/FilterModal';
 import { MoviesList } from '../components/forms/MoviesList';
 import { Pagination } from '../components/ui/Pagination';
 import { tmdbService, type Movie } from '../services';
@@ -13,14 +15,22 @@ export const MoviesContainer: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<MovieFilters | null>(null);
 
-  // Carrega filmes ao montar e quando página/busca mudar
+  // Carrega filmes ao montar e quando página/busca/filtros mudarem
   const loadMovies = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = searchQuery
-        ? await tmdbService.searchMovies(searchQuery, currentPage)
-        : await tmdbService.getPopularMovies(currentPage);
+      let response;
+
+      // Prioridade: search > filters > popular
+      if (searchQuery) {
+        response = await tmdbService.searchMovies(searchQuery, currentPage);
+      } else if (activeFilters) {
+        response = await tmdbService.discoverMovies(currentPage, activeFilters);
+      } else {
+        response = await tmdbService.getPopularMovies(currentPage);
+      }
 
       console.log('API Response:', response); // Debug
       console.log('Movies count:', response.results.length); // Debug
@@ -35,7 +45,7 @@ export const MoviesContainer: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, activeFilters]);
 
   useEffect(() => {
     loadMovies();
@@ -55,8 +65,22 @@ export const MoviesContainer: React.FC = () => {
     setCurrentPage(page);
   };
 
+  const handleApplyFilters = (filters: MovieFilters) => {
+    console.log('Aplicando filtros:', filters);
+    setActiveFilters(filters);
+    setCurrentPage(1); // Reset para primeira página ao aplicar filtros
+    setSearchQuery(''); // Limpa busca quando aplica filtros
+  };
+
   return (
     <div className='flex flex-col w-full min-h-screen py-0 sm:py-0'>
+      {/* Modal de Filtros */}
+      <FilterModal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        onApplyFilters={handleApplyFilters}
+      />
+
       {/* Header: Search + Filters + Add Movie */}
       <div className='w-full flex flex-col md:flex-row md:justify-end gap-2 sm:gap-2.5 px-4 my-6 flex-shrink-0 max-w-[1322px] mx-auto'>
         {/* Search Input */}
@@ -88,7 +112,7 @@ export const MoviesContainer: React.FC = () => {
             variant='secondary'
             onClick={() => setShowFilters(!showFilters)}
             className='h-[44px] filter-button'
-            style={{ width: '136px', minWidth: '136px' }}
+            style={{ width: '98px', minWidth: '98px' }}
           >
             Filtros
           </Button>
@@ -104,6 +128,7 @@ export const MoviesContainer: React.FC = () => {
           variant='secondary'
           onClick={() => setShowFilters(!showFilters)}
           className='hidden md:flex h-[44px] filter-button'
+          style={{ width: '98px', minWidth: '98px' }}
         >
           Filtros
         </Button>

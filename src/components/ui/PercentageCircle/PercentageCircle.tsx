@@ -1,43 +1,13 @@
 import React from 'react';
 import type { PercentageCircleProps } from './PercentageCircle.types';
+import { PERCENTAGE_CIRCLE_SIZES } from '../../../constants';
 
 export const PercentageCircle: React.FC<PercentageCircleProps> = ({
   percentage,
   size = 'medium',
   showLabel = true,
 }) => {
-  const sizeConfig = {
-    mobile: {
-      width: 69,
-      height: 69,
-      strokeWidth: 4,
-      fontSize: '16px',
-      radius: 30,
-    },
-    small: {
-      width: 98,
-      height: 98,
-      strokeWidth: 5,
-      fontSize: '24px',
-      radius: 42,
-    },
-    medium: {
-      width: 98,
-      height: 98,
-      strokeWidth: 5,
-      fontSize: '24px',
-      radius: 42,
-    },
-    large: {
-      width: 98,
-      height: 98,
-      strokeWidth: 5,
-      fontSize: '24px',
-      radius: 42,
-    },
-  };
-
-  const config = sizeConfig[size];
+  const config = PERCENTAGE_CIRCLE_SIZES[size];
   const circumference = 2 * Math.PI * config.radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
