@@ -7,6 +7,13 @@ export const PercentageCircle: React.FC<PercentageCircleProps> = ({
   showLabel = true,
 }) => {
   const sizeConfig = {
+    mobile: {
+      width: 69,
+      height: 69,
+      strokeWidth: 4,
+      fontSize: '16px',
+      radius: 30,
+    },
     small: {
       width: 98,
       height: 98,
@@ -37,7 +44,7 @@ export const PercentageCircle: React.FC<PercentageCircleProps> = ({
   return (
     <div
       className='relative inline-flex items-center justify-center'
-      style={{ width: '98px', height: '98px' }}
+      style={{ width: `${config.width}px`, height: `${config.height}px` }}
     >
       {/* Fundo com blur - apenas interno */}
       <div

@@ -1,5 +1,5 @@
 export interface PercentageCircleProps {
   percentage: number;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'mobile' | 'small' | 'medium' | 'large';
   showLabel?: boolean;
 }
