@@ -3,6 +3,8 @@ export interface MovieCardProps {
   title: string;
   poster: string;
   rating?: number;
+  voteAverage?: number;
+  genreIds?: number[];
   isWatching?: boolean;
   progress?: number;
   onClick?: () => void;

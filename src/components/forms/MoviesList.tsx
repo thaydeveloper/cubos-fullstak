@@ -44,6 +44,8 @@ export const MoviesList: React.FC<MoviesListProps> = ({ movies, isLoading }) => 
             id={movie.id}
             title={movie.title}
             poster={tmdbService.getPosterUrl(movie.poster_path, 'w500')}
+            voteAverage={movie.vote_average}
+            genreIds={movie.genre_ids}
             isWatching={movie.isWatching}
             progress={movie.progress}
             onClick={() => console.log('Movie clicked:', movie.id)}
