@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MovieCard } from '../ui/MovieCard';
 import type { Movie } from '../../services';
 import { tmdbService } from '../../services';
@@ -9,6 +10,7 @@ interface MoviesListProps {
 }
 
 export const MoviesList: React.FC<MoviesListProps> = ({ movies, isLoading }) => {
+  const navigate = useNavigate();
   const hasMovies = movies.length > 0;
 
   if (isLoading) {
@@ -48,7 +50,7 @@ export const MoviesList: React.FC<MoviesListProps> = ({ movies, isLoading }) => 
             genreIds={movie.genre_ids}
             isWatching={movie.isWatching}
             progress={movie.progress}
-            onClick={() => console.log('Movie clicked:', movie.id)}
+            onClick={() => navigate(`/movies/${movie.id}`)}
           />
         </div>
       ))}

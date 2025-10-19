@@ -6,6 +6,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Roboto', 'system-ui', 'sans-serif'],
+        roboto: ['Roboto', 'system-ui', 'sans-serif'],
+        montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
       },
       colors: {
         purple: {

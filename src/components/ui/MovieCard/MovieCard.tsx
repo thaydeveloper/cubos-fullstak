@@ -1,9 +1,7 @@
 import React from 'react';
 import { cn } from '../../../utils/cn';
+import { PercentageCircle } from '../PercentageCircle';
 import type { MovieCardProps } from './MovieCard.types';
-
-const PROGRESS_RADIUS = 28;
-const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * PROGRESS_RADIUS;
 
 // Mapa de gêneros do TMDB
 const GENRE_MAP: Record<number, string> = {
@@ -33,13 +31,8 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   poster,
   voteAverage = 0,
   genreIds = [],
-  isWatching = false,
-  progress = 0,
   onClick,
 }) => {
-  const safeProgress = Math.min(Math.max(progress, 0), 100);
-  const dashOffset = PROGRESS_CIRCUMFERENCE * (1 - safeProgress / 100);
-
   // Converte vote_average (0-10) para porcentagem
   const percentage = Math.round((voteAverage / 10) * 100);
 
@@ -66,12 +59,28 @@ export const MovieCard: React.FC<MovieCardProps> = ({
 
         {/* Conteúdo padrão - sempre visível */}
         <div className='absolute bottom-0 left-0 right-0 p-2 sm:p-2.5 md:p-3 z-10 pointer-events-none transition-all duration-300 group-hover:bottom-2'>
-          <h3 className='text-white font-semibold text-xs sm:text-sm md:text-base leading-snug uppercase line-clamp-2 break-words mb-0 group-hover:mb-1 drop-shadow-lg transition-all duration-300'>
+          <h3
+            className='font-montserrat font-semibold uppercase line-clamp-2 break-words mb-0 group-hover:mb-1 drop-shadow-lg transition-all duration-300'
+            style={{
+              fontSize: '16px',
+              lineHeight: '100%',
+              letterSpacing: '0px',
+              color: '#EEEEEE',
+            }}
+          >
             {title}
           </h3>
           {/* Categorias só aparecem no hover */}
           {genres && (
-            <p className='text-white/80 text-[10px] sm:text-xs md:text-sm leading-snug truncate drop-shadow-md max-h-0 group-hover:max-h-10 opacity-0 group-hover:opacity-100 transition-all duration-300 overflow-hidden'>
+            <p
+              className='font-montserrat font-normal truncate drop-shadow-md max-h-0 group-hover:max-h-10 opacity-0 group-hover:opacity-100 transition-all duration-300 overflow-hidden'
+              style={{
+                fontSize: '12.8px',
+                lineHeight: '100%',
+                letterSpacing: '0px',
+                color: '#B4B4B4',
+              }}
+            >
               {genres}
             </p>
           )}
@@ -79,79 +88,13 @@ export const MovieCard: React.FC<MovieCardProps> = ({
 
         {/* Círculo de porcentagem - só aparece no hover */}
         <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-100 z-20'>
-          <div className='relative w-24 h-24 sm:w-28 sm:h-28'>
-            {/* Fundo com blur apenas no círculo */}
-            <div
-              className='absolute inset-0 rounded-full'
-              style={{
-                backdropFilter: 'blur(4px)',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              }}
-            />
-
-            {/* SVG do círculo */}
-            <svg className='w-full h-full transform -rotate-90 relative z-10' viewBox='0 0 100 100'>
-              <circle
-                cx='50'
-                cy='50'
-                r='45'
-                stroke='rgba(255, 255, 255, 0.2)'
-                strokeWidth='6'
-                fill='none'
-              />
-              <circle
-                cx='50'
-                cy='50'
-                r='45'
-                stroke='#FFE000'
-                strokeWidth='6'
-                fill='none'
-                strokeDasharray={`${2 * Math.PI * 45}`}
-                strokeDashoffset={`${2 * Math.PI * 45 * (1 - percentage / 100)}`}
-                strokeLinecap='round'
-              />
-            </svg>
-            <div className='absolute inset-0 flex items-center justify-center z-10'>
-              <span className='text-[#FFE000] text-2xl sm:text-3xl font-bold drop-shadow-lg'>
-                {percentage}%
-              </span>
-            </div>
+          <div
+            className='rounded-full p-2'
+            /*  */
+          >
+            <PercentageCircle percentage={percentage} size='medium' />
           </div>
         </div>
-
-        {/* Progress Ring (se estiver assistindo) - apenas fora do hover */}
-        {isWatching && safeProgress > 0 && (
-          <div className='absolute top-2 left-2 sm:top-3 sm:left-3 group-hover:opacity-0 transition-opacity duration-300'>
-            <div className='relative w-10 h-10 sm:w-12 sm:h-12 lg:w-11 lg:h-11'>
-              <svg className='w-full h-full transform -rotate-90' viewBox='0 0 64 64'>
-                <circle
-                  cx='32'
-                  cy='32'
-                  r={PROGRESS_RADIUS}
-                  stroke='rgba(255, 255, 255, 0.2)'
-                  strokeWidth='4'
-                  fill='none'
-                />
-                <circle
-                  cx='32'
-                  cy='32'
-                  r={PROGRESS_RADIUS}
-                  stroke='#FFE000'
-                  strokeWidth='4'
-                  fill='none'
-                  strokeDasharray={PROGRESS_CIRCUMFERENCE}
-                  strokeDashoffset={dashOffset}
-                  strokeLinecap='round'
-                />
-              </svg>
-              <div className='absolute inset-0 flex items-center justify-center'>
-                <span className='text-white text-[10px] sm:text-xs lg:text-[11px] font-bold'>
-                  {Math.round(safeProgress)}%
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
