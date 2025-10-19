@@ -58,7 +58,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           {/* Right Icon */}
           {rightIcon && (
-            <div className='absolute right-3 top-1/2 transform -translate-y-1/2'>{rightIcon}</div>
+            <div
+              className='absolute right-3 top-1/2 transform -translate-y-1/2'
+              style={{ color: 'var(--color-input-icon)' }}
+            >
+              {rightIcon}
+            </div>
           )}
         </div>
 

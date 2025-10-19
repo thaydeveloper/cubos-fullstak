@@ -34,25 +34,29 @@
   --color-purple-light: #ECD9FA;
   --color-purple-lightest: #F1DDFF;
 
-  /* Button Colors (Figma Design) */
+  /* Button Colors */
   --color-button-primary-bg: var(--color-purple-950);
   --color-button-primary-hover: var(--color-purple-accent);
   --color-button-primary-hover-border: rgba(241, 221, 255, 0.98);
   --color-button-active: var(--color-purple-900);
 
   --color-button-secondary-bg: rgba(183, 68, 247, 0.08);
-  --color-button-secondary-hover: rgba(193, 80, 255, 0.18);
-  --color-button-secondary-hover-border: rgba(241, 221, 255, 0.98);
-  --color-button-secondary-active: rgba(180, 18, 249, 0.04);
-  --color-button-secondary-active-border: rgba(241, 221, 255, 0.98);
+  --color-button-secondary-hover: rgba(183, 68, 247, 0.12);
+  --color-button-secondary-hover-border: rgba(183, 68, 247, 0.2);
+  --color-button-secondary-active: rgba(183, 68, 247, 0.06);
+  --color-button-secondary-active-border: rgba(183, 68, 247, 0.15);
   --color-button-secondary-disabled: rgba(235, 234, 248, 0.08);
   --color-button-secondary-disabled-border: rgba(236, 233, 253, 0.49);
 
-  /* Input Colors (Figma Design) */
+  /* Input Colors */
   --color-input-bg: #1A191B;
   --color-input-border: #3C393F;
   --color-input-border-focus: #8E4EC6;
   --color-input-text: #EEEEF0;
+  --color-input-icon: #B5B2BC;
+
+
+  --color-movies-container-bg: rgba(235, 234, 248, 0.08);
 
   /* Mauve Dark Palette  */
   --color-mauve-dark-50: #A09EA7;
@@ -160,7 +164,27 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: 'Roboto', system-ui, sans-serif;
+    background: var(--background);
   }
+
+  /* Garantir que a página Movies tenha o background correto */
+  .movies-page {
+    background: transparent !important;
+  }
+
+  /* Estilo específico para botão de filtros */
+  .filter-button {
+    background: rgba(183, 68, 247, 0.08) !important;
+    backdrop-filter: blur(4px) !important;
+    border: 1px solid rgba(183, 68, 247, 0.1) !important;
+  }
+
+  .filter-button:hover {
+    background: rgba(183, 68, 247, 0.12) !important;
+    border: 1px solid rgba(183, 68, 247, 0.2) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
 }
