@@ -1,33 +1,32 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { authService, type RegisterPayload, type LoginPayload } from '../services/auth.service';
+
 
 export interface User {
   id: string;
   name: string;
   email: string;
+  createdAt?: string;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
 
-export interface RegisterCredentials {
-  name: string;
-  email: string;
-  password: string;
-}
+
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
 }
 
+
 interface AuthActions {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
+  login: (credentials: LoginPayload) => Promise<void>;
+  register: (credentials: RegisterPayload) => Promise<void>;
+  refresh: () => Promise<void>;
   logout: () => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
@@ -35,61 +34,108 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions;
 
+// Helper para extrair mensagem de erro com segurança
+function extractErrorMessage(err: unknown): string {
+  if (typeof err === 'string') return err;
+  if (err && typeof err === 'object') {
+    const anyErr = err as { message?: string; response?: { data?: { message?: string } } };
+    return (
+      anyErr?.response?.data?.message ||
+      anyErr?.message ||
+      'Ocorreu um erro inesperado'
+    );
+  }
+  return 'Ocorreu um erro inesperado';
+}
+
 export const useAuthStore = create<AuthStore>()(
   persist(
-    set => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      accessToken: null,
+      refreshToken: null,
 
-      login: async (credentials: LoginCredentials) => {
+      login: async (credentials: LoginPayload) => {
         set({ isLoading: true, error: null });
-
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          const mockUser: User = {
-            id: '1',
-            name: credentials.email.split('@')[0],
-            email: credentials.email,
-          };
-
+          const response = await authService.login(credentials);
+          if (response.success && response.data) {
+            set({
+              user: response.data.user,
+              isAuthenticated: true,
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+              isLoading: false,
+              error: null,
+            });
+          } else {
+            set({
+              error: response.message || 'Erro ao fazer login',
+              isLoading: false,
+            });
+          }
+        } catch (err: unknown) {
           set({
-            user: mockUser,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Erro ao fazer login',
+            error: extractErrorMessage(err) || 'Erro ao fazer login',
             isLoading: false,
           });
         }
       },
 
-      register: async (credentials: RegisterCredentials) => {
+      register: async (credentials: RegisterPayload) => {
         set({ isLoading: true, error: null });
-
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          const mockUser: User = {
-            id: '1',
-            name: credentials.name,
-            email: credentials.email,
-          };
-
+          const response = await authService.register(credentials);
+          if (response.success && response.data) {
+            set({
+              user: response.data.user,
+              isAuthenticated: true,
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+              isLoading: false,
+              error: null,
+            });
+          } else {
+            set({
+              error: response.message || 'Erro ao fazer cadastro',
+              isLoading: false,
+            });
+          }
+        } catch (err: unknown) {
           set({
-            user: mockUser,
-            isAuthenticated: true,
+            error: extractErrorMessage(err) || 'Erro ao fazer cadastro',
             isLoading: false,
-            error: null,
           });
-        } catch (error) {
+        }
+      },
+
+      refresh: async () => {
+        const { refreshToken } = get();
+        if (!refreshToken) return;
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authService.refresh({ refreshToken });
+          if (response.success && response.data) {
+            set({
+              user: response.data.user,
+              isAuthenticated: true,
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+              isLoading: false,
+              error: null,
+            });
+          } else {
+            set({
+              error: response.message || 'Erro ao atualizar token',
+              isLoading: false,
+            });
+          }
+        } catch (err: unknown) {
           set({
-            error: error instanceof Error ? error.message : 'Erro ao fazer cadastro',
+            error: extractErrorMessage(err) || 'Erro ao atualizar token',
             isLoading: false,
           });
         }
@@ -99,6 +145,8 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: null,
           isAuthenticated: false,
+          accessToken: null,
+          refreshToken: null,
           error: null,
         });
       },
@@ -113,9 +161,11 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth-storage',
-      partialize: state => ({
+      partialize: (state: AuthStore) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
       }),
     },
   ),

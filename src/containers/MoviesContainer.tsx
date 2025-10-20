@@ -3,6 +3,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { FilterModal } from '../components/ui/FilterModal';
 import type { MovieFilters } from '../components/ui/FilterModal';
+import { MovieFormModal, type MovieFormData } from '../components/ui/MovieFormModal';
 import { MoviesList } from '../components/forms/MoviesList';
 import { Pagination } from '../components/ui/Pagination';
 import { tmdbService, type Movie } from '../services';
@@ -15,6 +16,7 @@ export const MoviesContainer: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showAddMovie, setShowAddMovie] = useState(false);
   const [activeFilters, setActiveFilters] = useState<MovieFilters | null>(null);
 
   // Carrega filmes ao montar e quando página/busca/filtros mudarem
@@ -52,8 +54,15 @@ export const MoviesContainer: React.FC = () => {
   }, [loadMovies]);
 
   const handleAddMovie = () => {
-    // TODO: Implementar lógica de adicionar filme
-    console.log('Add movie clicked');
+    setShowAddMovie(true);
+  };
+
+  const handleSubmitMovie = async (data: MovieFormData) => {
+    console.log('Dados do filme:', data);
+    // TODO: Implementar lógica de salvar filme na API
+    // Aqui você pode adicionar a chamada para a API quando estiver pronta
+    alert('Filme adicionado com sucesso! (funcionalidade de API pendente)');
+    setShowAddMovie(false);
   };
 
   const handleSearch = (query: string) => {
@@ -79,6 +88,15 @@ export const MoviesContainer: React.FC = () => {
         isOpen={showFilters}
         onClose={() => setShowFilters(false)}
         onApplyFilters={handleApplyFilters}
+      />
+
+      {/* Modal de Adicionar/Editar Filme */}
+      <MovieFormModal
+        isOpen={showAddMovie}
+        onClose={() => setShowAddMovie(false)}
+        onSubmit={handleSubmitMovie}
+        title='Adicionar Filme'
+        submitLabel='Adicionar Filme'
       />
 
       {/* Header: Search + Filters + Add Movie */}

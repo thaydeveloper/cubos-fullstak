@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MovieFormModal, type MovieFormData } from '../../components/ui/MovieFormModal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { tmdbService } from '../../services';
 import { MovieHero } from '../../components/MovieHero';
@@ -42,6 +43,7 @@ export const MovieDetails: React.FC = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -65,7 +67,13 @@ export const MovieDetails: React.FC = () => {
   }, [id]);
 
   const handleEdit = () => {
-    console.log('Editar filme:', id);
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = (data: MovieFormData) => {
+    // Aqui você pode chamar a API para atualizar o filme
+    console.log('Filme editado:', data);
+    setShowEditModal(false);
   };
 
   const handleDelete = () => {
@@ -106,6 +114,25 @@ export const MovieDetails: React.FC = () => {
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 20%, #000000 100%), url('/src/assets/images/background-hero.png')`,
       }}
     >
+      {/* Modal de edição de filme */}
+      <MovieFormModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleEditSubmit}
+        initialValues={{
+          title: movie.title,
+          originalTitle: movie.original_title,
+          description: movie.overview,
+          situation: '', // Se tiver campo específico, preencha aqui
+          releaseDate: movie.release_date,
+          budget: movie.budget?.toString() || '',
+          revenue: movie.revenue?.toString() || '',
+          originalLanguage: '', // Se tiver campo específico, preencha aqui
+        }}
+        title='Editar Filme'
+        submitLabel='Editar Filme'
+      />
+
       {/* Seção 1: Hero com detalhes do Filme */}
       <MovieHero
         title={movie.title}

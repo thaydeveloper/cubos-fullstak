@@ -10,7 +10,7 @@ export const LoginContainer: React.FC = () => {
   // Redirecionar se já estiver autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate('/movies', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -34,11 +34,5 @@ export const LoginContainer: React.FC = () => {
     }
   };
 
-  return (
-    <LoginForm
-      onSubmit={handleLogin}
-      isLoading={isLoading}
-      error={error}
-    />
-  );
+  return <LoginForm onSubmit={handleLogin} isLoading={isLoading} error={error} />;
 };

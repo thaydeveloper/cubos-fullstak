@@ -9,7 +9,7 @@ export const RegisterContainer: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate('/movies', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
