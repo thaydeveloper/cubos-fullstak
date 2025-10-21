@@ -1,2 +1,2 @@
-export { useAuthStore, type User, type LoginCredentials } from './authStore';
+export { useAuthStore, type User } from './authStore';
 export { useThemeStore } from './themeStore';

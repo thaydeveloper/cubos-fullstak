@@ -1,6 +1,5 @@
 /**
- * Mapa de gêneros do TMDB
- * Fonte: https://api.themoviedb.org/3/genre/movie/list
+ * Mapa de gêneros de filmes
  */
 export const GENRE_MAP: Record<number, string> = {
   28: 'Ação',

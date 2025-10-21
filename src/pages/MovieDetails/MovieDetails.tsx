@@ -1,47 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { MovieFormModal, type MovieFormData } from '../../components/ui/MovieFormModal';
 import { useParams, useNavigate } from 'react-router-dom';
-import { tmdbService } from '../../services';
+import { moviesService, type BackendMovie } from '../../services/movies.service';
+import { uploadService } from '../../services/upload.service';
 import { MovieHero } from '../../components/MovieHero';
 import { MovieTrailer } from '../../components/MovieTrailer';
-
-interface MovieDetail {
-  id: number;
-  title: string;
-  original_title: string;
-  overview: string;
-  tagline?: string;
-  poster_path: string;
-  backdrop_path: string;
-  release_date: string;
-  runtime: number;
-  budget: number;
-  revenue: number;
-  vote_average: number;
-  vote_count: number;
-  genres: Array<{ id: number; name: string }>;
-  videos?: {
-    results: Array<{
-      key: string;
-      site: string;
-      type: string;
-    }>;
-  };
-  release_dates?: {
-    results: Array<{
-      iso_3166_1: string;
-      release_dates: Array<{
-        certification: string;
-        type: number;
-      }>;
-    }>;
-  };
-}
 
 export const MovieDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [movie, setMovie] = useState<MovieDetail | null>(null);
+  const [movie, setMovie] = useState<BackendMovie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -51,10 +19,7 @@ export const MovieDetails: React.FC = () => {
 
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=83ea147b2c26bb1eaddc401dd773722a&language=pt-BR&append_to_response=videos,release_dates`,
-        );
-        const data = await response.json();
+        const data = await moviesService.getById(id);
         setMovie(data);
       } catch (error) {
         console.error('Erro ao carregar detalhes do filme:', error);
@@ -70,16 +35,76 @@ export const MovieDetails: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleEditSubmit = (data: MovieFormData) => {
-    // Aqui você pode chamar a API para atualizar o filme
-    console.log('Filme editado:', data);
-    setShowEditModal(false);
+  const handleEditSubmit = async (data: MovieFormData, file?: File | null) => {
+    try {
+      if (!id) return;
+      setIsLoading(true);
+
+      // Upload da imagem se houver arquivo
+      let imageUrl: string = (data.imageUrl ?? '').trim();
+      if (file) {
+        try {
+          imageUrl = await uploadService.uploadImage(file);
+        } catch (uploadErr) {
+          console.error('Erro no upload da imagem:', uploadErr);
+          throw new Error(
+            `Falha no upload da imagem: ${uploadErr instanceof Error ? uploadErr.message : 'Erro desconhecido'}`,
+          );
+        }
+      }
+
+      // Converte a data para ISO format
+      const releaseDateISO = data.releaseDate
+        ? new Date(data.releaseDate + 'T00:00:00.000Z').toISOString()
+        : new Date().toISOString();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const payload: any = {
+        title: data.title,
+        description: data.description,
+        duration: Number(data.duration),
+        releaseDate: releaseDateISO,
+        genre: data.genre,
+        director: data.director,
+        cast: data.cast
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean),
+        rating: Number(data.rating),
+        imageUrl: imageUrl,
+      };
+
+      // Inclui trailerUrl apenas se fornecido
+      if (data.trailerUrl && data.trailerUrl.trim().length > 0) {
+        payload.trailerUrl = data.trailerUrl.trim();
+      }
+
+      await moviesService.update(id, payload);
+
+      // Recarrega os detalhes do filme
+      const updatedMovie = await moviesService.getById(id);
+      setMovie(updatedMovie);
+      setShowEditModal(false);
+      alert('Filme atualizado com sucesso!');
+    } catch (e) {
+      console.error('Erro ao atualizar filme:', e);
+      alert(`Falha ao atualizar filme: ${e instanceof Error ? e.message : 'Erro desconhecido'}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = () => {
-    console.log('Deletar filme:', id);
-    // Implementar lógica de deleção
-    navigate('/movies');
+  const handleDelete = async () => {
+    try {
+      if (!id) return;
+      if (confirm('Tem certeza que deseja deletar este filme?')) {
+        await moviesService.remove(id);
+        navigate('/movies');
+      }
+    } catch (e) {
+      console.error('Erro ao deletar filme:', e);
+      alert('Falha ao deletar filme.');
+    }
   };
 
   if (isLoading) {
@@ -98,14 +123,7 @@ export const MovieDetails: React.FC = () => {
     );
   }
 
-  const percentage = Math.round((movie.vote_average / 10) * 100);
-  const trailerVideo = movie.videos?.results.find(
-    video => video.site === 'YouTube' && video.type === 'Trailer',
-  );
-
-  // Buscar certificação brasileira (BR)
-  const brRelease = movie.release_dates?.results.find(r => r.iso_3166_1 === 'BR');
-  const certification = brRelease?.release_dates.find(rd => rd.certification)?.certification;
+  const percentage = Math.round(((movie.rating || 0) / 10) * 100);
 
   return (
     <div
@@ -121,40 +139,41 @@ export const MovieDetails: React.FC = () => {
         onSubmit={handleEditSubmit}
         initialValues={{
           title: movie.title,
-          originalTitle: movie.original_title,
-          description: movie.overview,
-          situation: '', // Se tiver campo específico, preencha aqui
-          releaseDate: movie.release_date,
-          budget: movie.budget?.toString() || '',
-          revenue: movie.revenue?.toString() || '',
-          originalLanguage: '', // Se tiver campo específico, preencha aqui
+          description: movie.description,
+          duration: String(movie.duration || ''),
+          releaseDate: movie.releaseDate ? movie.releaseDate.split('T')[0] : '',
+          genre: movie.genre || '',
+          director: movie.director || '',
+          cast: (movie.cast || []).join(', '),
+          rating: String(movie.rating ?? ''),
+          imageUrl: movie.imageUrl || '',
+          trailerUrl: movie.trailerUrl || '',
         }}
         title='Editar Filme'
-        submitLabel='Editar Filme'
+        submitLabel='Salvar Alterações'
+        isLoading={isLoading}
       />
 
       {/* Seção 1: Hero com detalhes do Filme */}
       <MovieHero
         title={movie.title}
-        originalTitle={movie.original_title}
-        tagline={movie.tagline}
-        posterUrl={tmdbService.getPosterUrl(movie.poster_path, 'w500')}
-        backdropUrl={tmdbService.getBackdropUrl(movie.backdrop_path, 'original')}
-        overview={movie.overview}
-        genres={movie.genres}
-        votes={movie.vote_count}
+        originalTitle={movie.title}
+        posterUrl={movie.imageUrl || '/src/assets/images/background-hero.png'}
+        backdropUrl={movie.imageUrl || '/src/assets/images/background-hero.png'}
+        overview={movie.description}
+        genres={movie.genre ? [{ id: 0, name: movie.genre }] : []}
+        votes={0}
         percentage={percentage}
-        releaseDate={new Date(movie.release_date).toLocaleDateString('pt-BR')}
-        runtime={movie.runtime}
-        budget={movie.budget || 0}
-        revenue={movie.revenue || 0}
-        certification={certification}
+        releaseDate={new Date(movie.releaseDate).toLocaleDateString('pt-BR')}
+        runtime={movie.duration}
+        budget={0}
+        revenue={0}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
       {/* Seção 2: Trailer */}
-      {trailerVideo && <MovieTrailer videoKey={trailerVideo.key} />}
+      {movie.trailerUrl && <MovieTrailer url={movie.trailerUrl} />}
     </div>
   );
 };

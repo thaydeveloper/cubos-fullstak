@@ -1,20 +1,8 @@
 /**
- * Configurações da API do TMDB
+ * Configurações da API do Backend
  */
-export const TMDB_CONFIG = {
-  API_KEY: '83ea147b2c26bb1eaddc401dd773722a',
-  BASE_URL: 'https://api.themoviedb.org/3',
-  IMAGE_BASE_URL: 'https://image.tmdb.org/t/p',
-  LANGUAGE: 'pt-BR',
-  MAX_PAGES: 500, // Limite de páginas da API do TMDB
-} as const;
-
-/**
- * Tamanhos de imagem disponíveis no TMDB
- */
-export const IMAGE_SIZES = {
-  poster: ['w200', 'w500', 'w780', 'original'] as const,
-  backdrop: ['w780', 'w1280', 'original'] as const,
+export const API_CONFIG = {
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
 } as const;
 
 /**

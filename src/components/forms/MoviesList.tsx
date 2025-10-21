@@ -1,17 +1,24 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MovieCard } from '../ui/MovieCard';
-import type { Movie } from '../../services';
-import { tmdbService } from '../../services';
+
+type BackendMovieListItem = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  rating?: number;
+  genre?: string;
+};
 
 interface MoviesListProps {
-  movies: Movie[];
+  movies: Array<BackendMovieListItem>;
   isLoading: boolean;
 }
 
 export const MoviesList: React.FC<MoviesListProps> = ({ movies, isLoading }) => {
   const navigate = useNavigate();
-  const hasMovies = movies.length > 0;
+  const safeMovies = (Array.isArray(movies) ? movies : []).slice(0, 10);
+  const hasMovies = safeMovies.length > 0;
 
   if (isLoading) {
     return (
@@ -39,21 +46,28 @@ export const MoviesList: React.FC<MoviesListProps> = ({ movies, isLoading }) => 
       gap-3 grid-cols-2 auto-rows-fr
       md:gap-4 md:grid-cols-3
       lg:gap-4 lg:grid-cols-5 lg:grid-rows-2 lg:auto-rows-auto'
+      style={{ gridAutoFlow: 'row' }}
     >
-      {movies.slice(0, 10).map(movie => (
-        <div key={movie.id} className='w-full aspect-[2/3] max-h-[330px]'>
-          <MovieCard
-            id={movie.id}
-            title={movie.title}
-            poster={tmdbService.getPosterUrl(movie.poster_path, 'w500')}
-            voteAverage={movie.vote_average}
-            genreIds={movie.genre_ids}
-            isWatching={movie.isWatching}
-            progress={movie.progress}
-            onClick={() => navigate(`/movies/${movie.id}`)}
-          />
-        </div>
-      ))}
+      {safeMovies.map(item => {
+        const id = item.id;
+        const title = item.title;
+        const poster = item.imageUrl || '/src/assets/images/background-hero.png';
+        const rating = item.rating;
+        const genreText = item.genre || '';
+
+        return (
+          <div key={id} className='w-full aspect-[2/3] max-h-[330px]'>
+            <MovieCard
+              id={id}
+              title={title}
+              poster={poster}
+              rating={rating}
+              genreText={genreText}
+              onClick={() => navigate(`/movies/${id}`)}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };

@@ -2,16 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authService, type RegisterPayload, type LoginPayload } from '../services/auth.service';
 
-
 export interface User {
   id: string;
   name: string;
   email: string;
   createdAt?: string;
 }
-
-
-
 
 interface AuthState {
   user: User | null;
@@ -21,7 +17,6 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
 }
-
 
 interface AuthActions {
   login: (credentials: LoginPayload) => Promise<void>;
@@ -39,11 +34,7 @@ function extractErrorMessage(err: unknown): string {
   if (typeof err === 'string') return err;
   if (err && typeof err === 'object') {
     const anyErr = err as { message?: string; response?: { data?: { message?: string } } };
-    return (
-      anyErr?.response?.data?.message ||
-      anyErr?.message ||
-      'Ocorreu um erro inesperado'
-    );
+    return anyErr?.response?.data?.message || anyErr?.message || 'Ocorreu um erro inesperado';
   }
   return 'Ocorreu um erro inesperado';
 }
@@ -63,11 +54,18 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.login(credentials);
           if (response.success && response.data) {
+            // Salva tokens diretamente no localStorage como strings simples
+            const accessToken = response.data.tokens.accessToken;
+            const refreshToken = response.data.tokens.refreshToken;
+
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+
             set({
               user: response.data.user,
               isAuthenticated: true,
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
+              accessToken: accessToken,
+              refreshToken: refreshToken,
               isLoading: false,
               error: null,
             });
@@ -90,11 +88,18 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await authService.register(credentials);
           if (response.success && response.data) {
+            // Salva tokens diretamente no localStorage
+            const accessToken = response.data.tokens.accessToken;
+            const refreshToken = response.data.tokens.refreshToken;
+
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+
             set({
               user: response.data.user,
               isAuthenticated: true,
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
+              accessToken: accessToken,
+              refreshToken: refreshToken,
               isLoading: false,
               error: null,
             });
@@ -113,17 +118,24 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       refresh: async () => {
-        const { refreshToken } = get();
+        const refreshToken = localStorage.getItem('refreshToken') || get().refreshToken;
         if (!refreshToken) return;
         set({ isLoading: true, error: null });
         try {
           const response = await authService.refresh({ refreshToken });
           if (response.success && response.data) {
+            // Atualiza tokens no localStorage
+            const newAccessToken = response.data.tokens.accessToken;
+            const newRefreshToken = response.data.tokens.refreshToken;
+
+            localStorage.setItem('accessToken', newAccessToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+
             set({
               user: response.data.user,
               isAuthenticated: true,
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
+              accessToken: newAccessToken,
+              refreshToken: newRefreshToken,
               isLoading: false,
               error: null,
             });
@@ -142,6 +154,10 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        // Remove tokens do localStorage
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+
         set({
           user: null,
           isAuthenticated: false,
@@ -161,12 +177,15 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth-storage',
+      // Persiste TUDO exceto loading e error
       partialize: (state: AuthStore) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
+      // Força sync com localStorage
+      version: 1,
     },
   ),
 );

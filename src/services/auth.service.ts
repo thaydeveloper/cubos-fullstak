@@ -34,8 +34,10 @@ export interface AuthResponse {
       email: string;
       createdAt: string;
     };
-    accessToken: string;
-    refreshToken: string;
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
   };
   errors?: FieldError[];
 }

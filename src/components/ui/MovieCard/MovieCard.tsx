@@ -8,18 +8,23 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   title,
   poster,
   voteAverage = 0,
+  rating,
   genreIds = [],
+  genreText,
   onClick,
 }) => {
   // Converte vote_average (0-10) para porcentagem
-  const percentage = Math.round((voteAverage / 10) * 100);
+  const baseScore = typeof voteAverage === 'number' && voteAverage > 0 ? voteAverage : rating || 0;
+  const percentage = Math.round(((baseScore as number) / 10) * 100);
 
   // Pega os nomes dos gêneros
-  const genres = genreIds
-    .slice(0, 3)
-    .map(id => GENRE_MAP[id])
-    .filter(Boolean)
-    .join(', ');
+  const genres =
+    (genreText && genreText.trim()) ||
+    genreIds
+      .slice(0, 3)
+      .map(id => GENRE_MAP[id])
+      .filter(Boolean)
+      .join(', ');
 
   return (
     <div
@@ -30,7 +35,17 @@ export const MovieCard: React.FC<MovieCardProps> = ({
       )}
     >
       <div className='relative w-full h-full'>
-        <img src={poster} alt={title} loading='lazy' className='w-full h-full object-cover' />
+        <img
+          src={poster}
+          alt={title}
+          loading='lazy'
+          className='w-full h-full object-cover'
+          onError={e => {
+            const target = e.currentTarget as HTMLImageElement;
+            if (target.src.endsWith('background-hero.png')) return;
+            target.src = '/src/assets/images/background-hero.png';
+          }}
+        />
 
         {/* Overlay padrão (sempre visível) */}
         <div className='absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80' />

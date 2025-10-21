@@ -1,2 +1,4 @@
-// Serviço da API do TMDB
-export * from './tmdb.service';
+// Serviços do backend
+export * from './movies.service';
+export * from './auth.service';
+export * from './upload.service';

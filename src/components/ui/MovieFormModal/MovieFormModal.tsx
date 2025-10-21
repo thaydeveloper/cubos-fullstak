@@ -10,13 +10,22 @@ import { Input } from '../Input';
 
 const movieSchema = z.object({
   title: z.string().min(1, 'Nome do filme é obrigatório'),
-  originalTitle: z.string().min(1, 'Nome original é obrigatório'),
   description: z.string().min(1, 'Descrição é obrigatória'),
-  situation: z.string().min(1, 'Situação é obrigatória'),
+  duration: z
+    .string()
+    .min(1, 'Duração é obrigatória')
+    .refine(v => !Number.isNaN(Number(v)) && Number(v) > 0, 'Informe a duração em minutos'),
   releaseDate: z.string().min(1, 'Data de lançamento é obrigatória'),
-  budget: z.string().min(1, 'Orçamento é obrigatório'),
-  revenue: z.string().min(1, 'Receita é obrigatória'),
-  originalLanguage: z.string().min(1, 'Idioma original é obrigatório'),
+  genre: z.string().min(1, 'Gênero é obrigatório'),
+  director: z.string().min(1, 'Diretor é obrigatório'),
+  cast: z.string(),
+  rating: z
+    .string()
+    .min(1, 'Avaliação é obrigatória')
+    .refine(v => !Number.isNaN(Number(v)) && Number(v) >= 0 && Number(v) <= 10, 'De 0 a 10'),
+  // A URL será validada quando presente; regra de obrigatoriedade depende da presença de arquivo
+  imageUrl: z.string().url('Informe uma URL válida (https://...)').optional().or(z.literal('')),
+  trailerUrl: z.string().url('Informe uma URL válida (https://...)').optional().or(z.literal('')),
 });
 
 export const MovieFormModal: React.FC<MovieFormModalProps> = ({
@@ -28,27 +37,56 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
   title = 'Adicionar Filme',
   submitLabel = 'Adicionar Filme',
 }) => {
+  const [file, setFile] = React.useState<File | null>(null);
+  const emptyValues: MovieFormData = {
+    title: '',
+    description: '',
+    duration: '',
+    releaseDate: '',
+    genre: '',
+    director: '',
+    cast: '',
+    rating: '',
+    imageUrl: '',
+    trailerUrl: '',
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
   } = useForm<MovieFormData>({
     resolver: zodResolver(movieSchema),
-    defaultValues: initialValues as MovieFormData,
+    defaultValues: { ...emptyValues, ...(initialValues as Partial<MovieFormData>) },
   });
 
   useEffect(() => {
     if (isOpen) {
-      reset(initialValues as MovieFormData);
+      reset({ ...emptyValues, ...(initialValues as Partial<MovieFormData>) });
     }
-  }, [isOpen, initialValues, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleFormSubmit = (data: MovieFormData) => {
-    onSubmit(data);
+    // Se não há arquivo selecionado, a URL passa a ser obrigatória
+    const hasFile = !!file;
+    const hasUrl = !!data.imageUrl && data.imageUrl.trim().length > 0;
+
+    if (!hasFile && !hasUrl) {
+      setError('imageUrl', {
+        type: 'manual',
+        message: 'Informe a URL da imagem quando não selecionar um arquivo',
+      });
+      return;
+    }
+
+    onSubmit(data, file);
     reset();
+    setFile(null);
   };
 
   const handleCancel = () => {
@@ -112,18 +150,6 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
                 />
               </Form.Field>
 
-              {/* Campo Nome Original */}
-              <Form.Field name='originalTitle'>
-                <Input
-                  {...register('originalTitle')}
-                  type='text'
-                  label='Nome Original'
-                  placeholder='Digite o nome original'
-                  error={errors.originalTitle?.message}
-                  fullWidth
-                />
-              </Form.Field>
-
               {/* Campo Descrição */}
               <Form.Field name='description'>
                 <div className='flex flex-col gap-1 w-full'>
@@ -151,18 +177,6 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
                 </div>
               </Form.Field>
 
-              {/* Campo Situação */}
-              <Form.Field name='situation'>
-                <Input
-                  {...register('situation')}
-                  type='text'
-                  label='Situação'
-                  placeholder='Ex: Lançado, Em produção, etc.'
-                  error={errors.situation?.message}
-                  fullWidth
-                />
-              </Form.Field>
-
               {/* Campo Data de Lançamento */}
               <Form.Field name='releaseDate'>
                 <Input
@@ -174,41 +188,108 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
                 />
               </Form.Field>
 
-              {/* Campo Orçamento */}
-              <Form.Field name='budget'>
+              {/* Campo Duração (minutos) */}
+              <Form.Field name='duration'>
                 <Input
-                  {...register('budget')}
-                  type='text'
-                  label='Orçamento'
-                  placeholder='Ex: 100000000'
-                  error={errors.budget?.message}
+                  {...register('duration')}
+                  type='number'
+                  label='Duração (minutos)'
+                  placeholder='Ex: 120'
+                  error={errors.duration?.message}
                   fullWidth
                 />
               </Form.Field>
 
-              {/* Campo Receita */}
-              <Form.Field name='revenue'>
+              {/* Campo Gênero */}
+              <Form.Field name='genre'>
                 <Input
-                  {...register('revenue')}
+                  {...register('genre')}
                   type='text'
-                  label='Receita'
-                  placeholder='Ex: 500000000'
-                  error={errors.revenue?.message}
+                  label='Gênero'
+                  placeholder='Ex: Drama'
+                  error={errors.genre?.message}
                   fullWidth
                 />
               </Form.Field>
 
-              {/* Campo Idioma Original */}
-              <Form.Field name='originalLanguage'>
+              {/* Campo Diretor */}
+              <Form.Field name='director'>
                 <Input
-                  {...register('originalLanguage')}
+                  {...register('director')}
                   type='text'
-                  label='Idioma Original'
-                  placeholder='Ex: en, pt, es'
-                  error={errors.originalLanguage?.message}
+                  label='Diretor'
+                  placeholder='Ex: Denis Villeneuve'
+                  error={errors.director?.message}
                   fullWidth
                 />
               </Form.Field>
+
+              {/* Campo Elenco (separado por vírgulas) */}
+              <Form.Field name='cast'>
+                <Input
+                  {...register('cast')}
+                  type='text'
+                  label='Elenco (separe por vírgulas)'
+                  placeholder='Ex: Ator 1, Atriz 2, Ator 3'
+                  error={errors.cast?.message}
+                  fullWidth
+                />
+              </Form.Field>
+
+              {/* Campo Avaliação (0 a 10) */}
+              <Form.Field name='rating'>
+                <Input
+                  {...register('rating')}
+                  type='number'
+                  step='0.1'
+                  min='0'
+                  max='10'
+                  label='Avaliação (0 a 10)'
+                  placeholder='Ex: 7.5'
+                  error={errors.rating?.message}
+                  fullWidth
+                />
+              </Form.Field>
+
+              {/* Campo URL da Imagem */}
+              <Form.Field name='imageUrl'>
+                <Input
+                  {...register('imageUrl')}
+                  type='url'
+                  label='URL da Imagem'
+                  placeholder='https://...'
+                  error={errors.imageUrl?.message}
+                  fullWidth
+                />
+              </Form.Field>
+
+              {/* Campo URL do Trailer (opcional) */}
+              <Form.Field name='trailerUrl'>
+                <Input
+                  {...register('trailerUrl')}
+                  type='url'
+                  label='URL do Trailer (opcional)'
+                  placeholder='https://youtube.com/watch?v=...'
+                  error={errors.trailerUrl?.message}
+                  fullWidth
+                />
+              </Form.Field>
+
+              {/* Upload de Imagem (opcional) */}
+              <div className='flex flex-col gap-1 w-full'>
+                <label className='text-xs font-medium text-[var(--color-mauve-dark-300)] block'>
+                  Ou selecione um arquivo de imagem
+                </label>
+                <input
+                  type='file'
+                  accept='image/*'
+                  onChange={e => setFile(e.target.files?.[0] || null)}
+                  className='w-full text-sm text-[var(--color-input-text)]'
+                />
+                <span className='text-xs text-[var(--color-mauve-dark-extra-3)]/60'>
+                  Se você enviar um arquivo, a URL não é obrigatória (o arquivo terá prioridade).
+                </span>
+              </div>
             </Form.Root>
           </div>
 
