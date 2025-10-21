@@ -15,6 +15,7 @@ import {
 import { uploadService } from '../services/upload.service';
 import { GENRES } from '../constants';
 import SearchIcon from '../assets/icons/Search.svg';
+import { useDebounce } from '../hooks/useDebounce';
 
 export const MoviesContainer: React.FC = () => {
   const [movies, setMovies] = useState<BackendMovie[]>([]);
@@ -26,10 +27,13 @@ export const MoviesContainer: React.FC = () => {
   const [showAddMovie, setShowAddMovie] = useState(false);
   const [activeFilters, setActiveFilters] = useState<MovieFilters | null>(null);
 
+  // Debounce do searchQuery para evitar chamadas excessivas
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
+
   // Constrói os parâmetros de consulta do backend a partir do estado local
   const buildQuery = useCallback((): MoviesQuery => {
     const params: MoviesQuery = { page: currentPage, limit: 10 };
-    if (searchQuery) params.title = searchQuery;
+    if (debouncedSearchQuery) params.title = debouncedSearchQuery;
     if (activeFilters) {
       const { genre, yearFrom, yearTo, ratingMin } = activeFilters;
       if (genre && typeof genre === 'number') {
@@ -51,7 +55,7 @@ export const MoviesContainer: React.FC = () => {
       }
     }
     return params;
-  }, [activeFilters, currentPage, searchQuery]);
+  }, [activeFilters, currentPage, debouncedSearchQuery]);
 
   // Carrega filmes do backend ao montar e quando página/busca/filtros mudarem
   const loadMovies = useCallback(async () => {

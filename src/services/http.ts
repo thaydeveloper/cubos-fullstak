@@ -1,18 +1,15 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-// Usa a URL do backend definida no .env; se ausente, cai no mesmo fallback usado em auth.service.ts
 const API_BASE_URL =
   import.meta.env.VITE_BACKEND_URL ||
   'https://bernarda-unscratching-unalleviatingly.ngrok-free.dev/api';
 
 export const http = axios.create({
   baseURL: API_BASE_URL,
-  // Evita a página de aviso do ngrok nas chamadas XHR
   headers: { 'ngrok-skip-browser-warning': 'true' },
 });
 
-// Inicializa Authorization a partir do store (para requests feitas antes do primeiro interceptor rodar)
 try {
   const tokenInit = useAuthStore.getState().accessToken;
   if (tokenInit) {
@@ -22,7 +19,6 @@ try {
   /* ignore */
 }
 
-// Mantém o header Authorization sincronizado quando o token muda no store
 try {
   let lastToken: string | null | undefined = useAuthStore.getState().accessToken;
   useAuthStore.subscribe(state => {
@@ -41,7 +37,6 @@ try {
 }
 
 http.interceptors.request.use(config => {
-  // Lê o token diretamente do localStorage (string simples)
   const token = localStorage.getItem('accessToken');
 
   if (token) {
@@ -49,13 +44,11 @@ http.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Garante o header do ngrok mesmo se sobrescrito posteriormente
   config.headers = config.headers || {};
   if (!('ngrok-skip-browser-warning' in config.headers)) {
     (config.headers as Record<string, string>)['ngrok-skip-browser-warning'] = 'true';
   }
 
-  // Para hosts ngrok, também adiciona o parâmetro de query para evitar a página de aviso
   const base = API_BASE_URL;
   if (base.includes('ngrok-free.dev')) {
     const currentParams = (config.params ?? {}) as Record<string, unknown>;
@@ -67,7 +60,6 @@ http.interceptors.request.use(config => {
   return config;
 });
 
-// Interceptor de resposta: tenta refresh automático em 401/403 e repete a requisição
 let isRefreshing = false;
 let pendingQueue: Array<(token: string | null) => void> = [];
 
@@ -86,7 +78,6 @@ http.interceptors.response.use(
       originalConfig._retry = true;
 
       if (isRefreshing) {
-        // Espera o refresh em andamento e reexecuta depois
         const token = await new Promise<string | null>(resolve => {
           pendingQueue.push(resolve);
         });
@@ -100,7 +91,6 @@ http.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        // Usa o store para executar o refresh e pegar o novo token
         const store = useAuthStore.getState();
         await store.refresh();
         const newToken = useAuthStore.getState().accessToken || null;
@@ -117,7 +107,6 @@ http.interceptors.response.use(
       } catch (refreshErr) {
         processQueue(null);
         isRefreshing = false;
-        // Faz logout para limpar credenciais inválidas
         try {
           useAuthStore.getState().logout();
         } catch {

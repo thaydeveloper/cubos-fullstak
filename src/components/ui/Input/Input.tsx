@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../../utils/cn';
 import type { InputProps } from './Input.types';
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
   (
     { label, error, helperText, leftIcon, rightIcon, fullWidth = true, className, id, ...props },
     ref,
@@ -81,4 +81,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   },
 );
 
-Input.displayName = 'Input';
+InputComponent.displayName = 'Input';
+
+export const Input = React.memo(InputComponent);

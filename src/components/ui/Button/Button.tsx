@@ -3,7 +3,7 @@ import { cn } from '../../../utils/cn';
 import type { ButtonProps } from './Button.types';
 import { BUTTON_VARIANTS, BUTTON_SIZES } from '../../../constants';
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -65,4 +65,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-Button.displayName = 'Button';
+ButtonComponent.displayName = 'Button';
+
+export const Button = React.memo(ButtonComponent);

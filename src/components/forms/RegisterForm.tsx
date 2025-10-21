@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,8 +34,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   isLoading = false,
   error,
 }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -46,17 +46,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     resolver: zodResolver(registerSchema),
   });
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePasswordVisibility = useCallback(() => {
+    setShowPassword(prev => !prev);
+  }, []);
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+  const toggleConfirmPasswordVisibility = useCallback(() => {
+    setShowConfirmPassword(prev => !prev);
+  }, []);
 
-  const handleNavigateToLogin = () => {
+  const handleNavigateToLogin = useCallback(() => {
     navigate('/login');
-  };
+  }, [navigate]);
 
   return (
     <div className='flex items-center justify-center min-h-screen'>

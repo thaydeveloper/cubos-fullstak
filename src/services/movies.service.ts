@@ -1,5 +1,14 @@
 import { http } from './http';
 
+// Cache simples com TTL para getById
+interface CacheEntry {
+  data: BackendMovie;
+  timestamp: number;
+}
+
+const movieCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
 export interface MoviePayload {
   title: string;
   description: string;
@@ -157,8 +166,22 @@ export const moviesService = {
   },
 
   async getById(id: string): Promise<BackendMovie> {
+    // Verifica cache
+    const cached = movieCache.get(id);
+    const now = Date.now();
+
+    if (cached && now - cached.timestamp < CACHE_TTL) {
+      return cached.data;
+    }
+
+    // Busca da API
     const { data } = await http.get(`/movies/${id}`);
-    return data?.data || data;
+    const movie = data?.data || data;
+
+    // Armazena no cache
+    movieCache.set(id, { data: movie, timestamp: now });
+
+    return movie;
   },
 
   async create(payload: MoviePayload): Promise<BackendMovie> {
@@ -170,11 +193,19 @@ export const moviesService = {
   async update(id: string, payload: Partial<MoviePayload>): Promise<BackendMovie> {
     // O interceptor já adiciona o token automaticamente
     const { data } = await http.put(`/movies/${id}`, payload);
-    return data?.data || data;
+    const movie = data?.data || data;
+
+    // Invalida cache ao atualizar
+    movieCache.delete(id);
+
+    return movie;
   },
 
   async remove(id: string): Promise<void> {
     // O interceptor já adiciona o token automaticamente
     await http.delete(`/movies/${id}`);
+
+    // Invalida cache ao deletar
+    movieCache.delete(id);
   },
 };
