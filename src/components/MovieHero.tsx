@@ -40,7 +40,7 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
   onDelete,
 }) => {
   return (
-    <div className='w-full max-w-[1342px] mx-auto px-0  mb-8 pt-9'>
+    <div className='w-full max-w-[1342px] mx-auto px-2 sm:px-4 lg:px-0 mb-8 pt-4 sm:pt-6 lg:pt-9'>
       {/* Container interno com imagem de fundo */}
       <div
         className={
@@ -54,22 +54,22 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
       >
         {/* Container interno */}
         <div className='relative md:absolute md:inset-0 flex flex-col md:justify-center'>
-          <div className='w-full max-w-[1268px] mx-auto'>
+          <div className='w-full max-w-[1268px] mx-auto px-2 sm:px-4 lg:px-6'>
             {/* Desktop: Título, botões, cartaz, conteúdo, stats */}
             <div className='hidden md:block'>
-              <div className='mb-4 flex justify-between items-start'>
-                <div>
-                  <h1 className='text-white font-montserrat font-semibold text-4xl mb-2'>
+              <div className='mb-4 flex flex-col lg:flex-row justify-between items-start gap-4'>
+                <div className='flex-1'>
+                  <h1 className='text-white font-montserrat font-semibold text-2xl lg:text-3xl xl:text-4xl mb-2'>
                     {title}
                   </h1>
-                  <p className='text-white/60 font-montserrat text-sm'>
+                  <p className='text-white/60 font-montserrat text-xs sm:text-sm'>
                     Título original: {originalTitle}
                   </p>
                 </div>
-                <div className='flex gap-2 pl-4'>
+                <div className='flex gap-2'>
                   <Button
                     onClick={onDelete}
-                    className='font-montserrat font-semibold text-sm text-white'
+                    className='font-montserrat font-semibold text-sm text-white whitespace-nowrap'
                     style={{
                       width: '91px',
                       height: '44px',
@@ -87,7 +87,7 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                   </Button>
                   <button
                     onClick={onEdit}
-                    className='font-montserrat font-semibold text-sm text-white'
+                    className='font-montserrat font-semibold text-sm text-white whitespace-nowrap'
                     style={{
                       width: '82px',
                       height: '44px',
@@ -104,54 +104,57 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                   </button>
                 </div>
               </div>
-              <div className='flex gap-8'>
-                <div className='flex-shrink-0'>
+              <div className='flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8'>
+                <div className='flex-shrink-0 mx-auto lg:mx-0'>
                   <img
                     src={posterUrl}
                     alt={title}
-                    className='w-[374px] h-[542px] object-cover rounded-lg shadow-2xl'
+                    className='w-[280px] md:w-[320px] lg:w-[374px] h-auto lg:h-[542px] object-cover rounded-lg shadow-2xl'
                   />
                 </div>
-                <div className='flex-1 flex flex-col pt-6 sm:pt-9 lg:pt-0 xl:pt-6 2xl:pt-6'>
-                  {tagline && (
-                    <p className='text-white/70 font-montserrat text-base italic mb-4'>{tagline}</p>
+                <div className='flex-1 flex flex-col pt-2 md:pt-4 lg:pt-6 xl:pt-6'>
+                  {tagline ? (
+                    <p className='text-white/70 font-montserrat text-sm md:text-base italic mb-3 md:mb-4 px-2 md:px-0'>
+                      {tagline}
+                    </p>
+                  ) : (
+                    <p className='text-white/70 font-montserrat text-sm md:text-base italic mb-3 md:mb-4 px-2 md:px-0'>
+                      tudo termina quando acaba
+                    </p>
                   )}
-                  <div className='flex gap-6 pt-9'>
-                    <div className='flex flex-col'>
+                  <div className='flex flex-col lg:flex-row gap-4 lg:gap-6 pt-2 md:pt-4 lg:pt-9'>
+                    <div className='flex flex-col gap-4 w-full'>
                       <div
-                        className='rounded-lg p-4'
+                        className='rounded-lg p-3 md:p-4 w-full flex-1'
                         style={{
-                          width: '416px',
-                          height: '300px',
+                          minHeight: '250px',
                           backgroundColor: 'rgba(35, 34, 37, 0.6)',
                           backdropFilter: 'blur(4px)',
                         }}
                       >
-                        <h2 className='text-white font-montserrat font-semibold text-lg mb-3'>
+                        <h2 className='text-white font-montserrat font-semibold text-base md:text-lg mb-2 md:mb-3'>
                           SINOPSE
                         </h2>
-                        <p className='text-white/80 font-montserrat text-sm leading-relaxed overflow-y-auto max-h-[240px]'>
+                        <p className='text-white/80 font-montserrat text-xs md:text-sm leading-relaxed overflow-y-auto max-h-[200px] md:max-h-[240px]'>
                           {overview || 'Sinopse não disponível.'}
                         </p>
                       </div>
                       <div
-                        className='rounded p-4'
+                        className='rounded p-3 md:p-4 w-full'
                         style={{
-                          width: '325px',
                           backgroundColor: 'rgba(35, 34, 37, 0.6)',
                           backdropFilter: 'blur(4px)',
-                          marginTop: '16px',
                           borderRadius: '4px',
                         }}
                       >
-                        <h3 className='text-white font-montserrat font-semibold text-sm mb-2'>
+                        <h3 className='text-white font-montserrat font-semibold text-xs md:text-sm mb-2'>
                           Generos
                         </h3>
-                        <div className='flex gap-2'>
+                        <div className='flex flex-wrap gap-2'>
                           {genres.map(genre => (
                             <div
                               key={genre.id}
-                              className='rounded-sm px-2 py-2 font-montserrat text-sm text-white'
+                              className='rounded-sm px-2 py-1.5 md:py-2 font-montserrat text-xs md:text-sm text-white'
                               style={{
                                 backgroundColor: 'rgba(197, 80, 255, 0.18)',
                                 backdropFilter: 'blur(4px)',
@@ -165,7 +168,7 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                     </div>
                   </div>
                 </div>
-                <div className='flex flex-col gap-4'>
+                <div className='hidden lg:flex flex-col gap-4'>
                   <MovieStats
                     votes={votes}
                     percentage={percentage}
@@ -179,15 +182,13 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
               </div>
             </div>
             {/* Mobile: layout vertical, ordem conforme Figma */}
-            <div className='md:hidden flex flex-col items-center w-full pt-2 pb-16'>
+            <div className='md:hidden flex flex-col items-center w-full pt-2 pb-8 sm:pb-12 lg:pb-16 px-2 sm:px-4'>
               {/* Cartaz */}
               <img
                 src={posterUrl}
                 alt={title}
-                className='mb-4 shadow-2xl'
+                className='mb-4 shadow-2xl w-full max-w-[340px] sm:max-w-[382px] h-auto'
                 style={{
-                  width: '382px',
-                  height: '582px',
                   borderRadius: '4px',
                   objectFit: 'cover',
                   opacity: 1,
@@ -195,10 +196,10 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                 }}
               />
               {/* Botões */}
-              <div className='flex flex-row gap-2 mb-4 w-full justify-center items-center'>
+              <div className='flex flex-row gap-2 mb-4 w-full max-w-[382px] justify-center items-center px-2'>
                 <Button
                   onClick={onDelete}
-                  className='font-montserrat font-semibold text-sm text-white'
+                  className='font-montserrat font-semibold text-xs sm:text-sm text-white'
                   style={{
                     width: '91px',
                     height: '44px',
@@ -216,9 +217,9 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                 </Button>
                 <Button
                   onClick={onEdit}
-                  className='font-montserrat font-semibold text-sm text-white'
+                  className='font-montserrat font-semibold text-xs sm:text-sm text-white flex-1'
                   style={{
-                    width: '270px',
+                    maxWidth: '270px',
                     height: '44px',
                     minHeight: '44px',
                     borderRadius: '2px',
@@ -235,14 +236,16 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                 </Button>
               </div>
               {/* Título e título original */}
-              <div className='w-full text-center mb-4'>
-                <h1 className='text-white font-montserrat font-semibold text-2xl mb-1'>{title}</h1>
+              <div className='w-full text-center mb-4 px-2'>
+                <h1 className='text-white font-montserrat font-semibold text-xl sm:text-2xl mb-1'>
+                  {title}
+                </h1>
                 <p className='text-white/60 font-montserrat text-xs'>
                   Título original: {originalTitle}
                 </p>
               </div>
               {/* Classificação, votos, percentual */}
-              <div className='flex justify-center items-center gap-4 mb-4 w-full'>
+              <div className='flex justify-center items-center gap-2 sm:gap-4 mb-4 w-full px-2'>
                 <MovieStats
                   votes={votes}
                   percentage={percentage}
@@ -256,12 +259,12 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
               </div>
               {/* Sinopse */}
               {tagline && (
-                <p className='text-white/70 font-montserrat text-base italic mb-2 text-center mb-4'>
+                <p className='text-white/70 font-montserrat text-base italic mb-2 text-center mb-4 px-2'>
                   {tagline}
                 </p>
               )}
               <div
-                className='rounded-lg p-4 w-full max-w-[340px] mb-4'
+                className='rounded-lg p-4 w-full mb-4 px-2'
                 style={{ backgroundColor: 'rgba(35,34,37,0.6)', backdropFilter: 'blur(4px)' }}
               >
                 <h2 className='text-white font-montserrat font-semibold text-lg mb-2'>SINOPSE</h2>
@@ -271,7 +274,7 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
               </div>
               {/* Gêneros */}
               <div
-                className='rounded p-4 w-full max-w-[340px] mb-4'
+                className='rounded p-4 w-full mb-4 px-2'
                 style={{
                   backgroundColor: 'rgba(35,34,37,0.6)',
                   backdropFilter: 'blur(4px)',
@@ -295,7 +298,7 @@ export const MovieHero: React.FC<MovieHeroProps> = ({
                 </div>
               </div>
               {/* Estatísticas restantes */}
-              <div className='w-full max-w-[340px] mb-4'>
+              <div className='w-full mb-4 px-2'>
                 <MovieStats
                   votes={votes}
                   percentage={percentage}

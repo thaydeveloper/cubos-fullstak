@@ -10,6 +10,7 @@ export interface MovieFormModalProps {
 
 export interface MovieFormData {
   title: string;
+  tagline?: string;
   description: string;
   duration: string; // minutos
   releaseDate: string; // yyyy-mm-dd

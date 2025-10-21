@@ -35,6 +35,23 @@ export const MovieDetails: React.FC = () => {
     setShowEditModal(true);
   };
 
+  const handleGoBack = () => {
+    navigate('/movies');
+  };
+
+  /**
+   * Atualiza um filme específico seguindo a documentação da API
+   * PUT /api/movies/{id}
+   *
+   * Campos obrigatórios:
+   * - title, description, duration, releaseDate, genre, director, cast, rating, imageUrl
+   *
+   * Campos opcionais:
+   * - trailerUrl, tagline
+   *
+   * @param data - Dados do formulário
+   * @param file - Arquivo de imagem (opcional, se fornecido faz upload primeiro)
+   */
   const handleEditSubmit = async (data: MovieFormData, file?: File | null) => {
     try {
       if (!id) return;
@@ -53,31 +70,41 @@ export const MovieDetails: React.FC = () => {
         }
       }
 
-      // Converte a data para ISO format
+      // Valida se temos uma URL de imagem
+      if (!imageUrl) {
+        throw new Error('Uma URL de imagem válida é obrigatória');
+      }
+
+      // Converte a data para ISO format (data completa no formato ISO)
       const releaseDateISO = data.releaseDate
         ? new Date(data.releaseDate + 'T00:00:00.000Z').toISOString()
         : new Date().toISOString();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload: any = {
-        title: data.title,
-        description: data.description,
+      // Monta o payload conforme a documentação da API
+      const payload = {
+        title: data.title.trim(),
+        description: data.description.trim(),
         duration: Number(data.duration),
         releaseDate: releaseDateISO,
-        genre: data.genre,
-        director: data.director,
+        genre: data.genre.trim(),
+        director: data.director.trim(),
         cast: data.cast
           .split(',')
           .map(s => s.trim())
           .filter(Boolean),
         rating: Number(data.rating),
         imageUrl: imageUrl,
+        ...(data.trailerUrl &&
+          data.trailerUrl.trim().length > 0 && {
+            trailerUrl: data.trailerUrl.trim(),
+          }),
+        ...(data.tagline &&
+          data.tagline.trim().length > 0 && {
+            tagline: data.tagline.trim(),
+          }),
       };
 
-      // Inclui trailerUrl apenas se fornecido
-      if (data.trailerUrl && data.trailerUrl.trim().length > 0) {
-        payload.trailerUrl = data.trailerUrl.trim();
-      }
+      console.log('Payload enviado para atualização:', payload);
 
       await moviesService.update(id, payload);
 
@@ -132,6 +159,30 @@ export const MovieDetails: React.FC = () => {
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 20%, #000000 100%), url('/src/assets/images/background-hero.png')`,
       }}
     >
+      {/* Botão Voltar */}
+      <div className='w-full max-w-[1342px] mx-auto px-4 pt-4'>
+        <button
+          onClick={handleGoBack}
+          className='flex items-center gap-2 text-white hover:text-purple-400 transition-colors duration-200 font-montserrat font-medium text-sm group'
+        >
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='h-5 w-5 transform group-hover:-translate-x-1 transition-transform duration-200'
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M15 19l-7-7 7-7'
+            />
+          </svg>
+          Voltar para Filmes
+        </button>
+      </div>
+
       {/* Modal de edição de filme */}
       <MovieFormModal
         isOpen={showEditModal}
@@ -139,6 +190,7 @@ export const MovieDetails: React.FC = () => {
         onSubmit={handleEditSubmit}
         initialValues={{
           title: movie.title,
+          tagline: movie.tagline,
           description: movie.description,
           duration: String(movie.duration || ''),
           releaseDate: movie.releaseDate ? movie.releaseDate.split('T')[0] : '',
@@ -158,6 +210,7 @@ export const MovieDetails: React.FC = () => {
       <MovieHero
         title={movie.title}
         originalTitle={movie.title}
+        tagline={movie.tagline}
         posterUrl={movie.imageUrl || '/src/assets/images/background-hero.png'}
         backdropUrl={movie.imageUrl || '/src/assets/images/background-hero.png'}
         overview={movie.description}

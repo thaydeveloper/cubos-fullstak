@@ -10,6 +10,7 @@ import { Input } from '../Input';
 
 const movieSchema = z.object({
   title: z.string().min(1, 'Nome do filme é obrigatório'),
+  tagline: z.string().optional(),
   description: z.string().min(1, 'Descrição é obrigatória'),
   duration: z
     .string()
@@ -40,6 +41,7 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
   const [file, setFile] = React.useState<File | null>(null);
   const emptyValues: MovieFormData = {
     title: '',
+    tagline: '',
     description: '',
     duration: '',
     releaseDate: '',
@@ -146,6 +148,18 @@ export const MovieFormModal: React.FC<MovieFormModalProps> = ({
                   label='Nome do Filme'
                   placeholder='Digite o nome do filme'
                   error={errors.title?.message}
+                  fullWidth
+                />
+              </Form.Field>
+
+              {/* Campo Tagline */}
+              <Form.Field name='tagline'>
+                <Input
+                  {...register('tagline')}
+                  type='text'
+                  label='Tagline (opcional)'
+                  placeholder='Digite a tagline do filme'
+                  error={errors.tagline?.message}
                   fullWidth
                 />
               </Form.Field>

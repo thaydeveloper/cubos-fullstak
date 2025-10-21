@@ -11,6 +11,7 @@ export interface MoviePayload {
   rating: number;
   imageUrl: string; // URL após upload
   trailerUrl?: string; // URL do trailer (opcional)
+  tagline?: string;
 }
 
 export interface BackendMovie extends MoviePayload {
@@ -166,7 +167,7 @@ export const moviesService = {
     return data?.data || data;
   },
 
-  async update(id: string, payload: MoviePayload): Promise<BackendMovie> {
+  async update(id: string, payload: Partial<MoviePayload>): Promise<BackendMovie> {
     // O interceptor já adiciona o token automaticamente
     const { data } = await http.put(`/movies/${id}`, payload);
     return data?.data || data;

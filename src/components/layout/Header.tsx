@@ -93,7 +93,19 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onThemeToggle, onLog
               {/* Logout Button */}
               <button
                 onClick={onLogout}
-                className='px-3 w-[90px] h-[44px] py-1.5 md:px-4 md:py-2 rounded-lg transition-colors duration-200 font-medium outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400 text-sm md:text-base bg-[var(--color-purple-950)] hover:bg-purple-700 text-[var(--color-mauve-alpha-16)]'
+                className='font-medium text-sm md:text-base text-white outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400 transition-colors duration-200 bg-[var(--color-purple-950)] hover:bg-purple-700'
+                style={{
+                  width: '90px',
+                  height: '44px',
+                  minHeight: '44px',
+                  borderRadius: '2px',
+                  paddingTop: '12px',
+                  paddingRight: '20px',
+                  paddingBottom: '12px',
+                  paddingLeft: '20px',
+                  opacity: 1,
+                  transform: 'rotate(0deg)',
+                }}
               >
                 Logout
               </button>
