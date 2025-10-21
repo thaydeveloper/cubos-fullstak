@@ -89,8 +89,8 @@ function extractArrayCandidates(input: unknown): BackendMovie[] {
 }
 
 export const moviesService = {
-  async list(params: MoviesQuery = {}): Promise<MoviesPage> {
-    const res = await http.get('/movies', { params });
+  async list(params: MoviesQuery = {}, signal?: AbortSignal): Promise<MoviesPage> {
+    const res = await http.get('/movies', { params, signal });
     const { data, headers } = res as {
       data: unknown;
       headers?: Record<string, string>;
@@ -165,7 +165,7 @@ export const moviesService = {
     return { items, total, page, limit };
   },
 
-  async getById(id: string): Promise<BackendMovie> {
+  async getById(id: string, signal?: AbortSignal): Promise<BackendMovie> {
     // Verifica cache
     const cached = movieCache.get(id);
     const now = Date.now();
@@ -175,7 +175,7 @@ export const moviesService = {
     }
 
     // Busca da API
-    const { data } = await http.get(`/movies/${id}`);
+    const { data } = await http.get(`/movies/${id}`, { signal });
     const movie = data?.data || data;
 
     // Armazena no cache

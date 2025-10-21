@@ -1,49 +1,50 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { moviesService, type BackendMovie } from '../services/movies.service';
+import { moviesService, type MoviePayload } from '../services/movies.service';
 import { uploadService } from '../services/upload.service';
 import { MovieHero } from '../components/MovieHero';
 import { MovieTrailer } from '../components/MovieTrailer';
 import { MovieFormModal, type MovieFormData } from '../components/ui/MovieFormModal';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const MovieDetailsContainer: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [movie, setMovie] = useState<BackendMovie | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const { data: movie, isLoading } = useQuery({
+    queryKey: ['movie', id],
+    queryFn: ({ signal }: { signal?: AbortSignal }) => moviesService.getById(id!, signal),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    const fetchMovieDetails = async () => {
-      if (!id) return;
-      setIsLoading(true);
-      try {
-        const data = await moviesService.getById(id);
-        setMovie(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchMovieDetails();
-  }, [id]);
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<MoviePayload> }) =>
+      moviesService.update(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['movie', id] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => moviesService.remove(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['movies'] }),
+  });
 
   const handleEdit = useCallback(() => setShowEditModal(true), []);
   const handleGoBack = useCallback(() => navigate('/movies'), [navigate]);
 
   const handleEditSubmit = useCallback(
     async (data: MovieFormData, file?: File | null) => {
+      if (!id) return;
       try {
-        if (!id) return;
-        setIsLoading(true);
         let imageUrl: string = (data.imageUrl ?? '').trim();
-        if (file) {
-          imageUrl = await uploadService.uploadImage(file);
-        }
+        if (file) imageUrl = await uploadService.uploadImage(file);
         if (!imageUrl) throw new Error('Uma URL de imagem válida é obrigatória');
         const releaseDateISO = data.releaseDate
           ? new Date(data.releaseDate + 'T00:00:00.000Z').toISOString()
@@ -65,34 +66,30 @@ export const MovieDetailsContainer: React.FC = () => {
             data.trailerUrl.trim().length > 0 && { trailerUrl: data.trailerUrl.trim() }),
           ...(data.tagline && data.tagline.trim().length > 0 && { tagline: data.tagline.trim() }),
         };
-        await moviesService.update(id, payload);
-        const updatedMovie = await moviesService.getById(id);
-        setMovie(updatedMovie);
-        setShowEditModal(false);
-        alert('Filme atualizado com sucesso!');
+  await updateMutation.mutateAsync({ id, payload });
+  setShowEditModal(false);
+  alert('Filme atualizado com sucesso!');
       } catch (e) {
         alert(`Falha ao atualizar filme: ${e instanceof Error ? e.message : 'Erro desconhecido'}`);
-      } finally {
-        setIsLoading(false);
       }
     },
-    [id],
+    [id, updateMutation],
   );
 
   const handleDelete = useCallback(() => setShowDeleteModal(true), []);
   const confirmDelete = useCallback(async () => {
+    if (!id) return;
     try {
-      if (!id) return;
       setIsDeleting(true);
-      await moviesService.remove(id);
+      await deleteMutation.mutateAsync(id);
       navigate('/movies');
     } catch (e) {
       alert(`Falha ao deletar filme: ${e instanceof Error ? e.message : 'Erro desconhecido'}`);
     } finally {
-      setIsDeleting(false);
       setShowDeleteModal(false);
+      setIsDeleting(false);
     }
-  }, [id, navigate]);
+  }, [id, deleteMutation, navigate]);
 
   const percentage = useMemo(
     () => (movie ? Math.round(((movie.rating || 0) / 10) * 100) : 0),
