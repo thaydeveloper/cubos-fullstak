@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MovieFormModal, type MovieFormData } from '../../components/ui/MovieFormModal';
+import { ConfirmModal } from '../../components/ui/ConfirmModal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { moviesService, type BackendMovie } from '../../services/movies.service';
 import { uploadService } from '../../services/upload.service';
@@ -12,6 +13,8 @@ export const MovieDetails: React.FC = () => {
   const [movie, setMovie] = useState<BackendMovie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -122,15 +125,24 @@ export const MovieDetails: React.FC = () => {
   };
 
   const handleDelete = async () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       if (!id) return;
-      if (confirm('Tem certeza que deseja deletar este filme?')) {
-        await moviesService.remove(id);
-        navigate('/movies');
-      }
+      setIsDeleting(true);
+
+      await moviesService.remove(id);
+
+      // Redireciona após exclusão bem-sucedida
+      navigate('/movies');
     } catch (e) {
       console.error('Erro ao deletar filme:', e);
-      alert('Falha ao deletar filme.');
+      alert(`Falha ao deletar filme: ${e instanceof Error ? e.message : 'Erro desconhecido'}`);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -204,6 +216,18 @@ export const MovieDetails: React.FC = () => {
         title='Editar Filme'
         submitLabel='Salvar Alterações'
         isLoading={isLoading}
+      />
+
+      {/* Modal de confirmação de exclusão */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title='Excluir Filme'
+        message={`Tem certeza que deseja excluir o filme "${movie.title}"? Esta ação não pode ser desfeita.`}
+        confirmLabel='Excluir'
+        cancelLabel='Cancelar'
+        isLoading={isDeleting}
       />
 
       {/* Seção 1: Hero com detalhes do Filme */}
